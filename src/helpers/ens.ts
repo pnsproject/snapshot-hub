@@ -11,7 +11,7 @@ export async function uriGet(
 ) {
   key = key.replace(
     'storage.snapshot.page',
-    'storageapi.fleek.co/snapshot-team-bucket'
+    `storageapi.fleek.co/${process.env.FLEEK_BUCKET}`
   );
   if (key.includes('storageapi.fleek.co')) protocolType = 'https';
   let url = `https://${gateway}/${protocolType}/${key}`;

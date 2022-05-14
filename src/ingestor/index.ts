@@ -12,6 +12,7 @@ export default async function(body, version) {
       return await typedData(body);
     }
   } catch (e) {
+    console.log(e);
     return Promise.reject(e);
   }
 }

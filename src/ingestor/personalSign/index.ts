@@ -1,10 +1,10 @@
 import { hashMessage } from '@ethersproject/hash';
-import { pin } from '@snapshot-labs/pineapple';
 import { verifySignature } from './utils';
 import { jsonParse } from '../../helpers/utils';
 import { spaces } from '../../helpers/spaces';
 import writer from '../../writer';
 import gossip from '../../helpers/gossip';
+import { pinJson } from '../../helpers/ipfs';
 import relayer, { issueReceipt } from '../../helpers/relayer';
 import pkg from '../../../package.json';
 
@@ -60,8 +60,8 @@ export default async function ingestor(body) {
 
   gossip(body, msg.space);
 
-  const [pinned, receipt] = await Promise.all([
-    pin({
+  const [ipfs, receipt] = await Promise.all([
+    pinJson(`snapshot/${body.sig}`, {
       address: body.address,
       msg: body.msg,
       sig: body.sig,
@@ -69,7 +69,6 @@ export default async function ingestor(body) {
     }),
     issueReceipt(body.sig)
   ]);
-  const ipfs = pinned.cid;
   const id = ipfs;
 
   try {
@@ -79,11 +78,11 @@ export default async function ingestor(body) {
   }
 
   console.log(
-    '[ingestor] ',
-    `Address "${body.address}", `,
-    `Space "${msg.space}", `,
-    `Type "${msg.type}", `,
-    `Id "${id}", `,
+    '[ingestor]',
+    `Address "${body.address}"\n`,
+    `Space "${msg.space}"\n`,
+    `Type "${msg.type}"\n`,
+    `Id "${id}"\n`,
     `IPFS "${ipfs}"`
   );
 

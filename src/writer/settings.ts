@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual';
 import { storeSettings } from '../helpers/adapters/mysql';
 import { jsonParse } from '../helpers/utils';
 import { spaces } from '../helpers/spaces';
+import { getKey } from '../helpers/pns';
 
 const DEFAULT_NETWORK = process.env.DEFAULT_NETWORK || '1';
 
@@ -18,7 +19,10 @@ export async function verify(body): Promise<any> {
     return Promise.reject('wrong space format');
   }
 
-  const spaceUri = await snapshot.utils.getSpaceUri(msg.space, DEFAULT_NETWORK);
+  // const spaceUri = await snapshot.utils.getSpaceUri(msg.space, DEFAULT_NETWORK);
+  const msgJson: any = JSON.parse(body.msg);
+  const spaceUri = await getKey(msgJson.space, 'text.url');
+  console.log('spaceUrispaceUrispaceUri', spaceUri);
   const isOwner = spaceUri.includes(body.address);
   const admins = (spaces[msg.space]?.admins || []).map(admin =>
     admin.toLowerCase()
@@ -28,6 +32,8 @@ export async function verify(body): Promise<any> {
     admin.toLowerCase()
   );
 
+  console.log('spaceUri', spaceUri);
+  console.log('admins', admins);
   if (!isAdmin && !isOwner) return Promise.reject('not allowed');
 
   if (!isOwner && !isEqual(admins, newAdmins))
